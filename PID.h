@@ -6,10 +6,10 @@ typedef double (*pidkFunction)(double, double);
 class PID {
 public:
 	//uint8_t dForward : 1;
-	double target, input;								//Ä¿±êÖµ,·´À¡Öµ
-	double Kp, Ki, Kd;									//±ÈÀýÏµÊý,»ý·ÖÏµÊý,Î¢·ÖÏµÊý
+	double target, input;								//ç›®æ ‡å€¼,åé¦ˆå€¼
+	double Kp, Ki, Kd;									//æ¯”ä¾‹ç³»æ•°,ç§¯åˆ†ç³»æ•°,å¾®åˆ†ç³»æ•°
 	pidkFunction KpFunction, KiFunction, KdFunction;	//
-	double sT;											//ÀëÉ¢»¯ÏµÍ³µÄ²ÉÑùÖÜÆÚ
+	double sT;											//ç¦»æ•£åŒ–ç³»ç»Ÿçš„é‡‡æ ·å‘¨æœŸ
 	double e0, e1, e2;									//e(k),(k-1),e(k-2)
 	double o0, o1;										//u(k),u(k-1)
 	double inputScalerMin, inputScalerMax, outputScalerMin, outputScalerMax;
@@ -34,6 +34,8 @@ public:
 		outputScalerMin = outputMin, outputScalerMax = outputMax;
 	}
 	void update() {
+		e2 = e1;
+		e1 = e0;
 		e0 = hardcodeMap((target - input), inputScalerMin, inputScalerMax, -1.0, 1.0);
 		double kp = KpFunction == 0 ? Kp : KpFunction(e0, Kp), kd = KdFunction == 0 ? Kd : KdFunction(e0, Kd), ki = KiFunction == 0 ? Ki : KiFunction(e0, Ki);
 		double a2 = kd / sT;
@@ -43,7 +45,5 @@ public:
 		o0 = o1 + a0 * e0 + a1 * e1 + a2 * e2;
 		if (o0 > 1) o0 = 1;
 		if (o0 < -1) o0 = -1;
-		e2 = e1;
-		e1 = e0;
 	}
 };
